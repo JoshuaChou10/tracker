@@ -3,6 +3,11 @@ import { useState, useEffect } from 'react';
 import Image from "next/image";
 
 export default function Home() {
+  const [currentTracker, setCurrentTracker] = useState<string>('Tracker1');
+  const [trackers, setTrackers] = useState<{ [key: string]: any }>({
+    Tracker1: { count: 0, goal: 0, goalCondition: 'Above', addNumber: 1, countsByDay: [], tracking: '' },
+    
+  });
   const [count, setCount] = useState<number>(0);
   const [countsByDay, setCountsByDay] = useState<{ date: string, count: number, dayName: string }[]>([]);
   const [goal, setGoal] = useState<number>(0);
@@ -10,83 +15,80 @@ export default function Home() {
   const [addNumber, setAddNumber] = useState<number>(1);
   const [tracking, setTracking] = useState<string>('');
 
-useEffect(() => {
-  const savedTracking = localStorage.getItem('tracking');
-  if (savedTracking !== null) setTracking(savedTracking);
-}, []);
+  useEffect(() => {
+    const savedTracking = localStorage.getItem('tracking');
+    if (savedTracking !== null) setTracking(savedTracking);
+  }, []);
 
-const handleTrackingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const newTracking = e.target.value;
-  setTracking(newTracking);
-  localStorage.setItem('tracking', newTracking);
-};
+  const handleTrackingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTracking = e.target.value;
+    setTracking(newTracking);
+    localStorage.setItem('tracking', newTracking);
+  };
 
   useEffect(() => {
     const savedGoal = localStorage.getItem('goal');
-    if (savedGoal !== null) setGoal(parseInt(savedGoal, 10));
-  
+    if (savedGoal !== null) setGoal(parseFloat(savedGoal));
+
     const savedGoalCondition = localStorage.getItem('goalCondition');
     if (savedGoalCondition !== null) setGoalCondition(savedGoalCondition);
-  
-    var savedAddNumber = localStorage.getItem('addNumber');
-    if (!Number.isNaN(savedAddNumber)){
-      savedAddNumber='1'
+
+    const savedAddNumber = localStorage.getItem('addNumber');
+    if (savedAddNumber !== null && !Number.isNaN(parseFloat(savedAddNumber))) {
+      setAddNumber(parseFloat(savedAddNumber));
     }
-    if (savedAddNumber !== null ) setAddNumber(parseInt(savedAddNumber, 10));
   }, []);
-  
+
   const handleGoalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newGoal = parseInt(e.target.value, 10);
+    const newGoal = parseFloat(e.target.value);
     setGoal(newGoal);
     localStorage.setItem('goal', newGoal.toString());
   };
-  
+
   const handleGoalConditionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newCondition = e.target.value;
     setGoalCondition(newCondition);
     localStorage.setItem('goalCondition', newCondition);
   };
-  
-  const handleAddNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newAddNumber = parseInt(e.target.value, 10);
-if (!Number.isNaN(newAddNumber)){
-  setAddNumber(newAddNumber);
-}
 
-   
-    localStorage.setItem('addNumber', newAddNumber.toString());
+  const handleAddNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newAddNumber = parseFloat(e.target.value);
+    if (!Number.isNaN(newAddNumber)) {
+      setAddNumber(newAddNumber);
+      localStorage.setItem('addNumber', newAddNumber.toString());
+    }
   };
+
   useEffect(() => {
     const today = new Date();
     const dateStrings = [];
     let dateString = today.toISOString().split('T')[0];
-
+    const previousDay = new Date(today); // Initialize previousDay here
+  
     while (true) {
       const savedCount = localStorage.getItem(`count${dateString}`);
       if (savedCount === null) {
         break;
       }
       const dateObj = new Date(dateString);
- 
-
-const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-
-      dateStrings.push({ date: dateString, count: parseInt(savedCount, 10), dayName });
-      const previousDay = new Date(today);
+      dateObj.setDate(dateObj.getDate() + 1); // Adjust the date by adding 1 day
+      const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+  
+      dateStrings.push({ date: dateString, count: parseFloat(savedCount), dayName });
+  
+      // Decrement the previousDay date correctly within the loop
       previousDay.setDate(previousDay.getDate() - 1);
       dateString = previousDay.toISOString().split('T')[0];
     }
-
+  
     setCountsByDay(dateStrings);
-
-    var todayCount = localStorage.getItem(`count${today.toISOString().split('T')[0]}`);
-    if (!Number.isNaN(todayCount)){
-      todayCount='1'
-    }
-    if (todayCount !== null) {
-      setCount(parseInt(todayCount, 10));
+  
+    const todayCount = localStorage.getItem(`count${today.toISOString().split('T')[0]}`);
+    if (todayCount !== null && !Number.isNaN(parseFloat(todayCount))) {
+      setCount(parseFloat(todayCount));
     }
   }, []);
+  
 
   const Add = () => {
     setCount(prev => {
@@ -149,7 +151,9 @@ const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
       if (goalCondition === "Above" && count >= goal) {
         return  "text-2xl text-green-500";
       } else if (goalCondition === "Below") {
+     
         if (count >= goal) return "text-2xl text-red-500";
+        if (count==0) return "text-2xl text-green-500"
         if (Math.abs(goal-count)<=2) return  "text-2xl text-orange-500";
         if (count < goal) return "text-2xl text-green-500";
       
@@ -180,7 +184,7 @@ const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
     onChange={handleTrackingChange}
     className="mb-4 p-1 bg-gray-700 text-white rounded w-full"
   />
-  <h2 className="text-lg font-bold mb-2">Goal</h2>
+  <h2 className="text-lg font-bold mb-2">Goal for Today</h2>
   <select 
     value={goalCondition} 
     onChange={handleGoalConditionChange} 
@@ -227,6 +231,7 @@ const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
         <h2 className="text-lg font-bold mb-2">Increase/Decrease</h2>
   <input
     type="number"
+    step="0.5"
     value={addNumber}
     onChange={handleAddNumberChange}
     className="w-16 p-1 bg-gray-700 text-white rounded"
