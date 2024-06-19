@@ -8,6 +8,19 @@ export default function Home() {
     Tracker1: { count: 0, goal: 0, goalCondition: 'Above', addNumber: 1, countsByDay: [], tracking: '' },
     
   });
+  const [note, setNote] = useState<string>('');
+
+useEffect(() => {
+  const savedNote = localStorage.getItem('note');
+  if (savedNote !== null) setNote(savedNote);
+}, []);
+
+const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const newNote = e.target.value;
+  setNote(newNote);
+  localStorage.setItem('note', newNote);
+};
+
   const [count, setCount] = useState<number>(0);
   const [countsByDay, setCountsByDay] = useState<{ date: string, count: number, dayName: string }[]>([]);
   const [goal, setGoal] = useState<number>(0);
@@ -176,6 +189,16 @@ export default function Home() {
           </a>
         </div>
       </div>
+      <div className="fixed right-0 top-0 p-4 bg-gray-800 text-white rounded-lg shadow-lg">
+  <h2 className="text-lg font-bold mb-2">Notepad</h2>
+  <textarea
+    value={note}
+    onChange={handleNoteChange}
+    className="mb-4 p-2 bg-gray-700 text-white rounded w-full h-48"
+    placeholder="Write any notes here"
+  />
+</div>
+
       <div className="fixed left-0 top-0 p-4 bg-gray-800 text-white rounded-lg shadow-lg">
   <h2 className="text-lg font-bold mb-2">What are you tracking?</h2>
   <input
