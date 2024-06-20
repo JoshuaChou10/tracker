@@ -175,8 +175,8 @@ const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     return "text-2xl"
     };
     const Hide=()=>{
-      setNote('')
-      setTracking('')
+      setNote('By clicking on the title, all information is hidden. Just reload the page and all data will be back.')
+      setTracking('You have found an easter egg')
 
     }
   
@@ -204,7 +204,7 @@ const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 </div>
 
       <div className="fixed left-0 top-0 p-4 bg-gray-800 text-white rounded-lg shadow-lg">
-  <h2 className="text-lg font-bold mb-2">What are you Tracking? </h2>
+  <h2 className="text-lg font-bold mb-2">What Habit do You Plan to Build/Break?</h2>
   <input
     type="text"
     value={tracking}
