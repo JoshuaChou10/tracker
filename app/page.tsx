@@ -199,7 +199,7 @@ const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     value={note}
     onChange={handleNoteChange}
     className="mb-4 p-2 bg-gray-700 text-white rounded w-full h-48"
-    placeholder="Write any notes here"
+    placeholder="Write any notes or reminders here"
   />
 </div>
 
@@ -277,6 +277,10 @@ const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
           </div>
         ))}
       </div>
+
+  <footer className="mt-12 text-center text-gray-500 ">
+    <p>Made by Joshua Chou © {new Date().getFullYear()}</p>
+  </footer>
     </main>
   );
 }
