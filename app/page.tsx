@@ -233,10 +233,10 @@ const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 
         <Image
           className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/tracker2.png"
+          src="/tracker3.png"
           alt="Tracker Logo"
-          width={200}
-          height={42}
+          width={230}
+          height={82}
       
           priority
         />
